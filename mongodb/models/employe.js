@@ -7,22 +7,23 @@ const EmployeSchema = mongoose.Schema({
     name: { type: String, required: true, unique: true },
     address: { type: String, required: true },
     phoneNumber: { type: String, required: true, unique: true },
-    gender: { type: String, required: true, enum: ['M','F','Other']},
+    gender: { type: String, required: true, enum: ['M', 'F', 'Other'] },
     email: { type: String, required: true, unique: true },
     dateEmbauche: { type: Date, required: true },
     post: { type: String, required: true },
-    projet:[{type:mongoose.Schema.Types.ObjectId,ref:'Projet'}],
-    event:[{type:mongoose.Schema.Types.ObjectId,ref:'Event'}],
-    task:[{type:mongoose.Schema.Types.ObjectId,ref:'Task'}],
-    etat: {
+    project: [{ type: mongoose.Schema.Types.ObjectId, ref: 'project' }],
+    event: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
+    task: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+    status: {
         type: String,
         required: true,
-        enum: ['Actif', 'En congé', 'Suspendu', 'En probation', 'Terminé', 'En formation', 'Retraité']
+        enum: ['Active', 'Inactive', 'Suspended', 'Completed'],
+        default:'Active'
     },
     dateRenvoi: { type: Date }  // Facultatif, utilisé uniquement si l'état est "Terminé"
 
-},{
-    timestamps:true
+}, {
+    timestamps: true
 });
 
 

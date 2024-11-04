@@ -1,10 +1,13 @@
 // softDeletePlugin.js
 export default function softDeletePlugin(schema) {
     // Add 'deleted' and 'deletedAt' fields to the schema
-    schema.add({
-        deleted: { type: Boolean, default: false },
-        deletedAt: { type: Date }
-    });
+    if (!schema.path('deleted')) {
+        schema.add({ deleted: { type: Boolean, default: false } });
+    }
+
+    if (!schema.path('deletedAt')) {
+        schema.add({ deletedAt: { type: Date } });
+    }
 
     // Method to perform a soft delete on a document
     schema.methods.softDelete = function () {
@@ -19,23 +22,13 @@ export default function softDeletePlugin(schema) {
     };
 
     // Middleware to exclude logically deleted documents from find queries
-    schema.pre('find', function() {
-        this.where({ deleted: false });
+    schema.pre(['find', 'findOne', 'findById', 'findOneAndUpdate', 'countDocuments', 'aggregate'], function () {
+        // Vérifier si 'this' a la méthode 'where'
+        if (this.where) {
+            this.where({ deleted: false });
+        } else {
+            // Si 'this' n'a pas 'where', il s'agit probablement d'une agrégation
+            this.pipeline().unshift({ $match: { deleted: false } });
+        }
     });
-
-    schema.pre('findOne', function() {
-        this.where({ deleted: false });
-    });
-
-    schema.pre('findOneAndUpdate', function() {
-        this.where({ deleted: false });
-    });
-
-    schema.pre('findById', function() {
-        this.where({ deleted: false });
-    });
-
-    schema.pre('findByIdAndUpdate', function() {
-        this.where({ deleted: false });
-    });
-};
+}

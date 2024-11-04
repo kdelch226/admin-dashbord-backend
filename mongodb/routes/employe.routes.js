@@ -3,12 +3,13 @@ import {
     getAllEmployes,
     getEmployeByID,
     creatEmployes,
-    updatedEmployes
+    updatedEmployes,
+    employeStatistic
 } from '../controllers/employe.controller.js';
 
 const router =express.Router();
 
-
+router.route('/statistics').get(employeStatistic)
 router.route('/').get(getAllEmployes);
 router.route('/:id').get(getEmployeByID);
 router.route('/').post(creatEmployes);

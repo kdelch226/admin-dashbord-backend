@@ -6,10 +6,15 @@ import 'dotenv/config';
 import userRouter from './mongodb/routes/user.routes.js'
 import serviceRouter from './mongodb/routes/service.routes.js';
 import clientRouter from './mongodb/routes/client.routes.js'
+import eventRouter from './mongodb/routes/event.routes.js'
 import employeRouter from './mongodb/routes/employe.routes.js';
-import projetRouter from './mongodb/routes/projet.routes.js';
-import taskRouter from './mongodb/routes/projet.routes.js';
-
+import projectRouter from './mongodb/routes/project.routes.js';
+import taskRouter from './mongodb/routes/task.routes.js';
+import activitiesRouter from './mongodb/routes/activities.routes.js';
+import journalLogsRouter from './mongodb/routes/journalLogs.routes.js';
+import expenseRouter from './mongodb/routes/expense.routes.js';
+import paymentRouter from './mongodb/routes/payment.routes.js';
+import objectiveRouter from './mongodb/routes/objective.routes.js';
 import authenticateToken from './middleware/auth.js';
 import connexion from './mongodb/routes/connexion.routes.js';
 import { geoipMiddleware } from './middleware/location.js';
@@ -27,7 +32,15 @@ app.use('/baobabapi/v1/tasks',authenticateToken,taskRouter);
 app.use('/baobabapi/v1/users',authenticateToken,userRouter);
 app.use('/baobabapi/v1/agents',authenticateToken,employeRouter);
 app.use('/baobabapi/v1/clients',authenticateToken,clientRouter);
-app.use('/baobabapi/v1/projets',authenticateToken,projetRouter);
+app.use('/baobabapi/v1/events',authenticateToken,eventRouter);
+app.use('/baobabapi/v1/activities',authenticateToken,activitiesRouter);
+app.use('/baobabapi/v1/journalLogs',authenticateToken,journalLogsRouter);
+app.use('/baobabapi/v1/projects',authenticateToken,projectRouter);
+app.use('/baobabapi/v1/expenses',authenticateToken,expenseRouter);
+app.use('/baobabapi/v1/payments',authenticateToken,paymentRouter);
+app.use('/baobabapi/v1/objectives',authenticateToken,objectiveRouter);
+
+
 
 
 

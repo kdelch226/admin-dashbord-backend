@@ -1,5 +1,5 @@
+import Auditslog from "../models/auditslog.js";
 import User from "../models/user.js";
-import AuditsLog from '../models/auditsLog.js'
 import mongoose from 'mongoose'
 
 const logAudit = async (req, userId, action) => {
@@ -14,7 +14,7 @@ const logAudit = async (req, userId, action) => {
         const user = await User.findOne({ email }).session(session);
         if (!user) throw new Error('User not found');
 
-        const newAuditLog =await new AuditsLog({
+        const newAuditLog = await new Auditslog({
             user: userId,
             action,
             userMail: email,
@@ -27,7 +27,7 @@ const logAudit = async (req, userId, action) => {
 
         await newAuditLog.save({ session });
         session.commitTransaction();
-    
+
     } catch (error) {
         console.error('Error logging audit:', error);
     }
@@ -91,27 +91,67 @@ const handleLogin = async (req, res) => {
         const userExists = await User.findOne({ email }).session(session);
         let userObjet = {};
 
-        if (userExists) userObjet = userExists;
+        if (userExists) {
+            if (userExists.name && userExists.avatar) userObjet = userExists;
+            else {
+                const userUpdated = await User.findByIdAndUpdate(
+                    userExists._id,
+                    {
+                        name,
+                        avatar,
+                    },
+                    { new: true, session } // Add session here
+                );
+
+                userObjet = userUpdated;
+            }
+
+        }
         else {
-            const newUser = await User({
-                name,
-                email,
-                avatar,
-            }).session(session);
-            userObjet = newUser;
+            return res.status(404).json({ message: 'user not found' })
         }
 
         await logAudit(req, userObjet._id, 'login');
         session.commitTransaction()
         res.status(200).json(userObjet);
     } catch (error) {
-        console.log(error)
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
+export const handleCreateAdmin = async (req, res) => {
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    const email = req.get('X-Email-Creator');
+    const newEmail = req.body;
+
+    try {
+
+        const userExists = await User.findOne({ newEmail }).session(session);
+
+        if (userExists) return res.status(404).json({ message: 'user already exist' });
+
+
+        const newAudit = new Audit({
+            action: 'Update',
+            documentId: id,
+            documentType: 'user',
+            changedBy: email,
+            changes: { number, adress },
+            timestamp: new Date(),
+        });
+
+        await newAudit.save({ session });
+        session.commitTransaction()
+        res.status(200).json({ message: 'Admin added Succesfuly' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 export const handleLogout = async (req, res) => {
-    // Logique de déconnexion utilisateur ici...
+
     const userExists = await User.findOne({ email }).session(session);
 
     await logAudit(req, userExists._id, 'logout');
@@ -120,6 +160,8 @@ export const handleLogout = async (req, res) => {
 };
 
 const updatedUser = async (req, res) => {
+    const session = await mongoose.startSession()
+    session.startTransaction();
     try {
         const { id } = req.params;
         const { number, adress } = req.body;
@@ -131,9 +173,19 @@ const updatedUser = async (req, res) => {
 
         await User.findByIdAndUpdate(
             id,
-            { $set: updateFields }
-        ).then()
+            { $set: updateFields },
+            { new: true, session }
+        )
+        const newAudit = new Audit({
+            action: 'Update',
+            documentId: id,
+            documentType: 'user',
+            changedBy: email,
+            changes: { number, adress },
+            timestamp: new Date(),
+        });
 
+        await newAudit.save({ session });
 
     }
     catch (error) {

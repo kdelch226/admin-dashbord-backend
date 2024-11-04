@@ -3,12 +3,13 @@ import {
     getAllClients,
     getClientByID,
     creatClients,
-    updatedClients
+    updatedClients,
+    getClientStatistique
 } from '../controllers/client.controller.js';
 
 const router =express.Router();
 
-
+router.route('/statistics').get(getClientStatistique)
 router.route('/').get(getAllClients);
 router.route('/:id').get(getClientByID);
 router.route('/').post(creatClients);
