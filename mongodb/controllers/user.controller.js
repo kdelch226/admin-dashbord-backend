@@ -1,4 +1,5 @@
 import Auditslog from "../models/auditslog.js";
+import Audit from '../models/audit.js';
 import User from "../models/user.js";
 import mongoose from 'mongoose'
 
