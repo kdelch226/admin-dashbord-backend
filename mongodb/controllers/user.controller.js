@@ -119,7 +119,7 @@ const handleLogin = async (req, res) => {
     }
 };
 
-export const handleCreateAdmin = async (req, res) => {
+const createAdmin = async (req, res) => {
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -198,5 +198,6 @@ export {
     getAllUsers,
     getUserById,
     handleLogin,
-    updatedUser
+    updatedUser,
+    createAdmin
 }
