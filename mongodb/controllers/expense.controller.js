@@ -378,7 +378,7 @@ const getProfitByweekOnMonth = async (req, res) => {
 
         const maxInList = (listA, listB, key) => {
             const list = [...listA, ...listB];
-            return Math.max(list.map(item => item[key]))
+            return Math.max(...list.map(item => item[key]))
         }
 
         const max = maxInList(expenseByDay, paymentByDay, '_id')
