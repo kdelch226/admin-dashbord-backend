@@ -20,25 +20,31 @@ import connexion from './mongodb/routes/connexion.routes.js';
 import { geoipMiddleware } from './middleware/location.js';
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: 'https://baobab-admin.netlify.app', // Spécifie l'origine autorisée
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Méthodes HTTP autorisées
+    allowedHeaders: ['Content-Type', 'Authorization'], // En-têtes autorisés
+    credentials: true // Si vous devez inclure des cookies dans les requêtes
+}));
+
 app.use(express.json({ limit: '50mb' }));
 app.get('/', (req, res) => {
     res.send({ message: 'hello world' })
 });
 app.use(geoipMiddleware)
-app.use('/baobabapi/v1/connexion',connexion);
-app.use('/baobabapi/v1/services',authenticateToken,serviceRouter);
-app.use('/baobabapi/v1/tasks',authenticateToken,taskRouter);
-app.use('/baobabapi/v1/users',authenticateToken,userRouter);
-app.use('/baobabapi/v1/agents',authenticateToken,employeRouter);
-app.use('/baobabapi/v1/clients',authenticateToken,clientRouter);
-app.use('/baobabapi/v1/events',authenticateToken,eventRouter);
-app.use('/baobabapi/v1/activities',authenticateToken,activitiesRouter);
-app.use('/baobabapi/v1/journalLogs',authenticateToken,journalLogsRouter);
-app.use('/baobabapi/v1/projects',authenticateToken,projectRouter);
-app.use('/baobabapi/v1/expenses',authenticateToken,expenseRouter);
-app.use('/baobabapi/v1/payments',authenticateToken,paymentRouter);
-app.use('/baobabapi/v1/objectives',authenticateToken,objectiveRouter);
+app.use('/baobabapi/v1/connexion', connexion);
+app.use('/baobabapi/v1/services', authenticateToken, serviceRouter);
+app.use('/baobabapi/v1/tasks', authenticateToken, taskRouter);
+app.use('/baobabapi/v1/users', authenticateToken, userRouter);
+app.use('/baobabapi/v1/agents', authenticateToken, employeRouter);
+app.use('/baobabapi/v1/clients', authenticateToken, clientRouter);
+app.use('/baobabapi/v1/events', authenticateToken, eventRouter);
+app.use('/baobabapi/v1/activities', authenticateToken, activitiesRouter);
+app.use('/baobabapi/v1/journalLogs', authenticateToken, journalLogsRouter);
+app.use('/baobabapi/v1/projects', authenticateToken, projectRouter);
+app.use('/baobabapi/v1/expenses', authenticateToken, expenseRouter);
+app.use('/baobabapi/v1/payments', authenticateToken, paymentRouter);
+app.use('/baobabapi/v1/objectives', authenticateToken, objectiveRouter);
 
 
 

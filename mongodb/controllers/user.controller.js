@@ -141,7 +141,6 @@ const createAdmin = async (req, res) => {
     session.startTransaction();
     const email = req.get('X-Email-Creator');
     const { newEmail } = req.body;
-
     try {
 
         const userExists = await User.findOne({ email: newEmail }).session(session);

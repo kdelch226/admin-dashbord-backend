@@ -3,6 +3,7 @@ import Expense from '../models/expense.js';
 import Audit from '../models/audit.js'
 import User from '../models/user.js';
 import Task from '../models/task.js';
+import Employe from '../models/employe.js';
 import Project from '../models/project.js';
 import Event from '../models/event.js';
 import cron from 'node-cron'
@@ -61,7 +62,7 @@ const getExpenseByID = async (req, res) => {
 }
 
 const creatExpenses = async (req, res) => {
-    const { title, amount, date, description, transactionMethod, recurrence, category, projectId, eventId, taskId } = req.body;
+    const { title, amount, date, description, transactionMethod, recurrence, category, projectId, eventId, taskId, employeId } = req.body;
     console.log('request ', req.body)
 
     const userEmail = req.get('X-Email-Creator');
@@ -79,22 +80,28 @@ const creatExpenses = async (req, res) => {
         const relatedObjectAttribut = {}
 
         if (projectId) {
-            const projectExist = Project.findOne({ id: projectId });
-            if (!projectExist) res.status(404).json({ message: 'project not found' })
+            const projectExist = await Project.findOne({ id: projectId });
+            if (!projectExist) return res.status(404).json({ message: 'project not found' })
             relatedObject = { project: projectId }
             relatedObjectAttribut = { projectTitle: projectExist.title, projectId: { projectId } }
         }
+        if (employeId) {
+            const employeExist = await Employe.findOne({ id: employeId });
+            if (!employeExist) return res.status(404).json({ message: 'project not found' })
+            relatedObject = { employe: employeId }
+            relatedObjectAttribut = { employeName: employeExist.name, employeId: { employeId } }
+        }
         if (eventId) {
-            const eventExist = Event.findOne({ id: eventId });
-            if (!eventExist) res.status(404).json({ message: 'event not found' })
+            const eventExist = await Event.findOne({ id: eventId });
+            if (!eventExist) return res.status(404).json({ message: 'event not found' })
             relatedObject = { event: eventId }
             relatedObjectAttribut = { eventTitle: eventExist.title, eventId: { eventId } }
         }
         if (taskId) {
-            const taskExist = Task.findOne({ id: taskId });
-            if (!taskExist) res.status(404).json({ message: 'task not found' })
+            const taskExist = await Task.findOne({ id: taskId });
+            if (!taskExist) return res.status(404).json({ message: 'task not found' })
             const relatedProject = [];
-            taskExist.relatedProject.forEach(projet=>{
+            taskExist.relatedProject.forEach(projet => {
                 relatedProject.push(projet._id)
             })
             relatedObject = { task: taskId };
