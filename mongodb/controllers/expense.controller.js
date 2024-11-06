@@ -93,7 +93,11 @@ const creatExpenses = async (req, res) => {
         if (taskId) {
             const taskExist = Task.findOne({ id: taskId });
             if (!taskExist) res.status(404).json({ message: 'task not found' })
-            relatedObject = { task: taskId }
+            const relatedProject = [];
+            taskExist.relatedProject.forEach(projet=>{
+                relatedProject.push(projet._id)
+            })
+            relatedObject = { task: taskId };
             relatedObjectAttribut = { taskTitle: taskExist.title, taskId: { taskId } }
         }
 
@@ -285,9 +289,8 @@ const getExpenseCurrentMonthCompareLastMonth = async (req, res) => {
             differencePercentage: differencePercentage,
             difference: (currentMonthTotal - lastMonthTotal)
         })
-
     } catch (error) {
-        console.log('expense month compare last month ', error)
+        // console.log('expense month compare last month ', error)
         res.status(500).json({ error: 'Erreur interne du serveur' });
     }
 }
@@ -310,7 +313,7 @@ const getWeekNumberInMonth = (day) => {
     // Trouver à quelle semaine appartient la date
     for (let weekNumber = 0; weekNumber < weekEnds.length; weekNumber++) {
         if (day <= weekEnds[weekNumber]) {
-            return weekNumber ; // Les semaines commencent à 0
+            return weekNumber; // Les semaines commencent à 0
         }
     }
 
@@ -372,10 +375,15 @@ const getProfitByweekOnMonth = async (req, res) => {
 
         const maxInList = (listA, listB, key) => {
             const list = [...listA, ...listB];
+<<<<<<< HEAD
             return Math.max(...list.map(item => item[key]))
+=======
+            return Math.max(...list.map(item => item[key]));
+>>>>>>> f41845e (user controller fix/ logical implementation)
         }
 
         const max = maxInList(expenseByDay, paymentByDay, '_id')
+        // console.log('max ',max)
         // Initialiser un tableau pour stocker les expense and payment de chaque semaine
         let expenseByWeek = Array(max).fill(0);
         let paymentByWeek = Array(max).fill(0);
@@ -383,25 +391,22 @@ const getProfitByweekOnMonth = async (req, res) => {
 
         expenseByDay.forEach((expense) => {
             const week = getWeekNumberInMonth(expense._id)
-            console.log('day ',expense._id,'weeknumber ',week)
+            // console.log('day ', expense._id, 'weeknumber ', week)
             expenseByWeek[week] += expense.amount
         })
         paymentByDay.forEach((payment) => {
             const week = getWeekNumberInMonth(payment._id)
-            console.log('day ',payment._id,'weeknumber ',week)
+            // console.log('day ', payment._id, 'weeknumber ', week)
             paymentByWeek[week] += payment.amount
         })
 
         for (let i = 0; i < weeksProfit.length; i++) {
             weeksProfit[i] = expenseByWeek[i] - paymentByWeek[i]
         }
-
-        console.log('weeksProfit ',weeksProfit)
-
-
+        // console.log('weeksProfit ', weeksProfit)
         // Calculer le profit pour chaque semaine
-
         // Return the array of profits by week
+
         res.status(200).json({
             month: monthToQuery + 1, // Display the month as a number from 1 to 12
             year: year,
@@ -409,7 +414,7 @@ const getProfitByweekOnMonth = async (req, res) => {
         });
 
     } catch (error) {
-        console.log('profit ', error); // Log any errors that occur
+        console.log('profitljjjjjjjjjjjj ', error); // Log any errors that occur
         res.status(500).json({ error: 'Erreur interne du serveur' }); // Return a server error response
     }
 }

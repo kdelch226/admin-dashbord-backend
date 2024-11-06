@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import Employe from '../models/employe.js'
+import Employe from '../models/employe.js';
+import Audit from '../models/audit.js'
 import 'dotenv/config';
 import { v2 as cloudinary } from 'cloudinary';
 import project from '../models/project.js';
@@ -127,6 +128,7 @@ const creatEmployes = async (req, res) => {
     } catch (error) {
         // Abort the transaction on error
         await session.abortTransaction();
+        console.log(error)
         res.status(500).json({ error: 'Failed to create employe' });
 
     } finally {

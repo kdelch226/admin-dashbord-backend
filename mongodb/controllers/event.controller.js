@@ -331,7 +331,7 @@ const removeEmployeFromEvent = async (req, res) => {
 
         // Remove the employee from the Event
         const updatedEvent = await Event.findByIdAndUpdate(
-            EventId,
+            eventId,
             { $pull: { assignedEmployees: id } },
             { new: true, session }
         );
@@ -344,7 +344,7 @@ const removeEmployeFromEvent = async (req, res) => {
         // Remove the Event from the employee's list of Events
         const updatedEmployee = await Employe.findByIdAndUpdate(
             id,
-            { $pull: { event: EventId } },
+            { $pull: { event: eventId } },
             { new: true, session }
         );
 
