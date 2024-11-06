@@ -86,6 +86,7 @@ const handleLogin = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
+    console.log('test')
     try {
         const { name, email, avatar } = req.body;
 
@@ -122,6 +123,7 @@ const handleLogin = async (req, res) => {
 
         }
         else {
+            console.log(error)
             return res.status(404).json({ message: 'user not found' })
         }
 

@@ -21,9 +21,9 @@ import { geoipMiddleware } from './middleware/location.js';
 const app = express();
 
 app.use(cors({
-    origin: 'https://baobab-admin.netlify.app', // Spécifie l'origine autorisée
+    origin: 'http://localhost:5173/', // Spécifie l'origine autorisée
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Méthodes HTTP autorisées
-    allowedHeaders: ['Content-Type', 'Authorization'], // En-têtes autorisés
+    allowedHeaders: ['Content-Type', 'Authorization','x-email-creator'], // En-têtes autorisés
     credentials: true // Si vous devez inclure des cookies dans les requêtes
 }));
 
