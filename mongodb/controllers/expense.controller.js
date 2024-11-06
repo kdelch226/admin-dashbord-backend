@@ -375,11 +375,7 @@ const getProfitByweekOnMonth = async (req, res) => {
 
         const maxInList = (listA, listB, key) => {
             const list = [...listA, ...listB];
-<<<<<<< HEAD
             return Math.max(...list.map(item => item[key]))
-=======
-            return Math.max(...list.map(item => item[key]));
->>>>>>> f41845e (user controller fix/ logical implementation)
         }
 
         const max = maxInList(expenseByDay, paymentByDay, '_id')
