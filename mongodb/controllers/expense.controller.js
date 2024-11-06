@@ -98,13 +98,9 @@ const creatExpenses = async (req, res) => {
             relatedObjectAttribut = { eventTitle: eventExist.title, eventId: { eventId } }
         }
         if (taskId) {
-            const taskExist = await Task.findOne({ id: taskId });
-            if (!taskExist) return res.status(404).json({ message: 'task not found' })
-            const relatedProject = [];
-            taskExist.relatedProject.forEach(projet => {
-                relatedProject.push(projet._id)
-            })
-            relatedObject = { task: taskId };
+            const taskExist = Task.findOne({ id: taskId });
+            if (!taskExist) res.status(404).json({ message: 'task not found' })
+            relatedObject = { task: taskId }
             relatedObjectAttribut = { taskTitle: taskExist.title, taskId: { taskId } }
         }
 
@@ -382,7 +378,7 @@ const getProfitByweekOnMonth = async (req, res) => {
 
         const maxInList = (listA, listB, key) => {
             const list = [...listA, ...listB];
-            return Math.max(...list.map(item => item[key]))
+            return Math.max(list.map(item => item[key]))
         }
 
         const max = maxInList(expenseByDay, paymentByDay, '_id')
