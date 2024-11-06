@@ -242,7 +242,8 @@ const deleteTask = async (req, res) => {
     const { id } = req.params;
     const email = req.get('X-Email-Creator');
     try {
-        const user = await User.findOne({ email }).session(session);
+        const user = await User.findOne({ email })
+            .session(session);
         if (!user) throw new Error('User not found');
 
         const taskToDelete = await Task.findById(id).session(session);

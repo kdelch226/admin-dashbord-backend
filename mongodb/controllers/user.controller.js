@@ -89,20 +89,33 @@ const handleLogin = async (req, res) => {
     try {
         const { name, email, avatar } = req.body;
 
-        const userExists = await User.findOne({ email }).session(session);
+        const userExist = await User.findOne({ email }).session(session);
         let userObjet = {};
 
-        if (userExists) {
-            if (userExists.name && userExists.avatar) userObjet = userExists;
+        if (userExist) {
+            if (userExist.name > 0 && userExist.avatar > 0) userObjet = userExists;
             else {
                 const userUpdated = await User.findByIdAndUpdate(
-                    userExists._id,
+                    userExist._id,
                     {
                         name,
                         avatar,
                     },
                     { new: true, session } // Add session here
                 );
+                const newAudit = new Audit({
+                    action: 'Update',
+                    documentId: userExist._id,
+                    documentType: 'user',
+                    changedBy: email,
+                    changes: {
+                        name: name,
+                        avatar: avatar,
+                    },
+                    timestamp: new Date(),
+                });
+
+                await newAudit.save({ session });
 
                 userObjet = userUpdated;
             }
@@ -112,42 +125,56 @@ const handleLogin = async (req, res) => {
             return res.status(404).json({ message: 'user not found' })
         }
 
+
+
         await logAudit(req, userObjet._id, 'login');
-        session.commitTransaction()
+        await session.commitTransaction()
         res.status(200).json(userObjet);
     } catch (error) {
+        await session.abortTransaction(); // Abort transaction on error
         res.status(500).json({ message: error.message });
     }
 };
 
 const createAdmin = async (req, res) => {
-
     const session = await mongoose.startSession();
     session.startTransaction();
     const email = req.get('X-Email-Creator');
-    const newEmail = req.body;
+    const { newEmail } = req.body;
 
     try {
 
-        const userExists = await User.findOne({ newEmail }).session(session);
+        const userExists = await User.findOne({ email: newEmail }).session(session);
 
-        if (userExists) return res.status(404).json({ message: 'user already exist' });
+        if (userExists) {
+            await session.abortTransaction();
+            return res.status(404).json({ message: 'user already exist' });
+        }
 
+        const newUser = new User({
+            email: newEmail,
+        })
+
+        await newUser.save({ session });
 
         const newAudit = new Audit({
-            action: 'Update',
-            documentId: id,
+            action: 'Create',
+            documentId: newUser._id,
             documentType: 'user',
             changedBy: email,
-            changes: { number, adress },
+            changes: { email: newEmail },
             timestamp: new Date(),
         });
 
         await newAudit.save({ session });
-        session.commitTransaction()
+        await session.commitTransaction()
         res.status(200).json({ message: 'Admin added Succesfuly' });
     } catch (error) {
+        await session.abortTransaction(); // Abort transaction on error
+        console.log('create user ', error);
         res.status(500).json({ message: error.message });
+    } finally {
+        await session.endSession();
     }
 }
 
@@ -191,6 +218,8 @@ const updatedUser = async (req, res) => {
     }
     catch (error) {
         res.status(400).json({ error })
+    } finally {
+        await session.endSession();
     }
 };
 
