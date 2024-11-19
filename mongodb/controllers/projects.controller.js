@@ -224,6 +224,7 @@ const updatedProjects = async (req, res) => {
         res.status(200).json({ message: 'Project updated successfully' });
 
     } catch (error) {
+        console.log(error)
         await session.abortTransaction();
         res.status(500).json({ error });
     } finally {
